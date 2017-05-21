@@ -54,6 +54,7 @@ public class InstructionsActivity extends Activity implements RecognitionListene
         progressBar = (ProgressBar) findViewById(R.id.progressBar2);
         steps = (TextView) findViewById(R.id.steps);
         drinkName = (TextView)findViewById(R.id.drinkName);
+        bundle = new Bundle();
         new InstructionsActivity.AsyncTaskClass().execute();
     }
 
@@ -132,8 +133,10 @@ public class InstructionsActivity extends Activity implements RecognitionListene
             if (matches.get(i).contains("next"))
             {
                 Toast.makeText(this,"Next",Toast.LENGTH_LONG).show();
+
                 Intent intent = new Intent(InstructionsActivity.this,InstructionsActivity.class);
-                intent.putExtras(this.getIntent().getExtras());
+//                intent.putExtras(this.getIntent().getExtras());
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
             if (matches.get(i).contains("previous"))
@@ -200,8 +203,11 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
     protected void cocktailDBAPI() throws IOException, JSONException {
 
+        flag = this.getIntent().getExtras().getInt("flag");
 
-   //     if(flag == 0) {
+        Log.i("Cocktail FLAG : ", flag+"");
+
+        if(flag == 0) {
             int b;
             Log.i("Cocktail STR_ID :", STR_ID);
             String searchById = "http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=" + getIntent().getExtras().getString(STR_ID);
@@ -221,36 +227,55 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
             String strInstr = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get(STR_INSTR).toString();
 
-            //splitting at "."
-         //   String[] splitAtDot = strInstr.split(".");
-
             strName = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get("strDrink").toString();
 
-
+            //splitting at "."
+            String[] splitAtDot = strInstr.split("\\.");
             Pattern pat = Pattern.compile("\\s\\s+");
-            if (strInstr != null &&
-                    !strInstr.isEmpty() &&
-                    !strInstr.matches(pat.pattern()) &&
-                    !strInstr.contains("null"))
-                getJSONContents.append("\u2022 ").append(strInstr).append("\n\n");
-//parse "."
-/*
-            String[] splitAtDot = strInstr.split(".");
-*//*
+            if (splitAtDot[flag] != null &&
+                    !splitAtDot[flag].isEmpty() &&
+                    !splitAtDot[flag].matches(pat.pattern()) &&
+                    !splitAtDot[flag].contains("null"))
+                getJSONContents.append("\u2022 ").append(splitAtDot[flag]).append("\n\n");
+
+            Log.i("Cocktail_Instr_1 : ", getJSONContents.toString());
+
             flag++;
             bundle.putStringArray("splitAtDot", splitAtDot);
             bundle.putInt("flag", flag);
-            Log.i("Cocktail_Instr : ", getJSONContents.toString());*/
-      /*  }
+            bundle.putString("strName" , strName);
 
+        }
         else {
-            String[] verifySplit = (String[]) bundle.get("splitAtDot");
+            String[] verifySplit = (String[]) this.getIntent().getExtras().getStringArray("splitAtDot");
+         //   flag = this.getIntent().getExtras().getInt("flag");
+
             if(flag < verifySplit.length) {
 
-            }
-        }*/
+                strName = this.getIntent().getExtras().getString("strName");
 
-    }
+                Pattern pat = Pattern.compile("\\s\\s+");
+                if (verifySplit[flag] != null &&
+                        !verifySplit[flag].isEmpty() &&
+                        !verifySplit[flag].matches(pat.pattern()) &&
+                        !verifySplit[flag].contains("null"))
+                    getJSONContents.append("\u2022 ").append(verifySplit[flag]).append("\n\n");
+//parse "."
+                flag++;
+                bundle.putStringArray("splitAtDot", verifySplit);
+                bundle.putInt("flag", flag);
+                bundle.putString("strName" , strName);
+
+                Log.i("Cocktail_Instr_2 : ", getJSONContents.toString());
+
+            }
+
+         /*   else {
+
+            }*/
+        }
+
+        }
 
 
     private class AsyncTaskClass extends AsyncTask {
