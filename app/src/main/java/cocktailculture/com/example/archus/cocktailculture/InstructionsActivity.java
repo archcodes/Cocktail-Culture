@@ -1,23 +1,19 @@
 package cocktailculture.com.example.archus.cocktailculture;
 
-
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -33,77 +29,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+public class InstructionsActivity extends Activity implements RecognitionListener {
 
-public class ListenActivity extends Activity implements RecognitionListener {
-
-    public static final String STR_INGREDIENT = "strIngredient";
+    public static final String STR_INSTR = "strInstructions";
     public static final String DRINKS = "drinks";
-    //private TextView returnedText;
-    private ToggleButton toggleButton;
     private ProgressBar progressBar;
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
-    private String LOG_TAG = "MainActivity";
-    public static final String STR_ID = "idDrink";
-    TextView text, drinkName;
+    TextView steps, drinkName;
     String strName;
-    Bundle bundle;
-
-
-    private final int REQ_CODE_SPEECH_INPUT = 100;
+    public static final String STR_ID = "idDrink";
     private HashMap<String, Integer> captions;
     private TextToSpeech text2speech;
     protected StringBuilder getJSONContents = new StringBuilder();
+    String LOG_TAG = "Cocktail : ";
 
 
-    //   private SpeechRecognizer sphinxRecognizer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOG_TAG, String.format("Inside Google"));
-        setContentView(R.layout.activity_listen);
-        //returnedText = (TextView) findViewById(R.id.textView1);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar1);
-      //  toggleButton = (ToggleButton) findViewById(R.id.toggleButton1);
-     //   progressBar.setVisibility(View.INVISIBLE);
-
-        new AsyncTaskClass().execute();
-
-        text = (TextView)findViewById(R.id.choice);
+        setContentView(R.layout.activity_instructions);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar2);
+        steps = (TextView) findViewById(R.id.steps);
         drinkName = (TextView)findViewById(R.id.drinkName);
-
-       /* int permissionCheck = ContextCompat.checkSelfPermission(ListenActivity.this,
-                Manifest.permission.RECORD_AUDIO);
-*/
-        /*speech = SpeechRecognizer.createSpeechRecognizer(this);
-        speech.setRecognitionListener(this);
-        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,"en");
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,this.getPackageName());
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-        speech.startListening(recognizerIntent);*/
-
-
-/*        toggleButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    progressBar.setIndeterminate(true);
-
-                } else {
-                    progressBar.setIndeterminate(false);
-                    progressBar.setVisibility(View.INVISIBLE);
-
-                }
-            }
-        });*/
-
+        new InstructionsActivity.AsyncTaskClass().execute();
     }
+
 
     @Override
     public void onResume() {
@@ -136,7 +89,7 @@ public class ListenActivity extends Activity implements RecognitionListener {
     public void onEndOfSpeech() {
         Log.i(LOG_TAG, "onEndOfSpeech");
         progressBar.setIndeterminate(true);
-     //   toggleButton.setChecked(false);
+        //   toggleButton.setChecked(false);
     }
 
     @Override
@@ -146,11 +99,11 @@ public class ListenActivity extends Activity implements RecognitionListener {
         Log.d(LOG_TAG, "FAILED " + errorMessage);
         /*returnedText.setText(errorMessage);*/
 
-   //     toggleButton.setChecked(false);
-       /* Intent data = new Intent();
+        //     toggleButton.setChecked(false);
+        Intent data = new Intent();
         data.putExtra("returnData", errorMessage);
         setResult(RESULT_OK, data);
-        super.finish();*/
+        super.finish();
     }
 
     @Override
@@ -179,9 +132,8 @@ public class ListenActivity extends Activity implements RecognitionListener {
             if (matches.get(i).contains("next"))
             {
                 Toast.makeText(this,"Next",Toast.LENGTH_LONG).show();
-          //      Intent intent = new Intent(ListenActivity.this,InstructionsActivity.class);
-          //      intent.putExtras(bundle);
-          //      startActivity(intent);
+                Intent intent = new Intent(InstructionsActivity.this,StepsActivity.class);
+                startActivity(intent);
             }
             if (matches.get(i).contains("previous"))
             {
@@ -245,13 +197,11 @@ public class ListenActivity extends Activity implements RecognitionListener {
         return message;
     }
 
-
     protected void cocktailDBAPI() throws IOException, JSONException {
 
         int b;
         Log.i("Cocktail STR_ID :", STR_ID);
         String searchById = "http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=" + getIntent().getExtras().getString(STR_ID);
-   //     bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
         StringBuilder getAPIContent = new StringBuilder();
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(searchById);
@@ -262,36 +212,38 @@ public class ListenActivity extends Activity implements RecognitionListener {
             getAPIContent.append((char) b);
         }
 
-        Log.i("Cocktail : ",getAPIContent.toString());
+        Log.i("Cocktail GETAPI: ",getAPIContent.toString());
 
         JSONObject jsonObject = new JSONObject(getAPIContent.toString());
 
         //15 because cocktailDB has max 15 ingredients ;)
         for(int j=1;j<=15;j++) {
 
-            String strIngredients = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get(STR_INGREDIENT + j).toString();
+            String strInstr = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get(STR_INSTR + j).toString();
             strName = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get("strDrink").toString();
 
 
             Pattern pat = Pattern.compile("\\s\\s+");
-            if (strIngredients!=null &&
-                    !strIngredients.isEmpty() &&
-                    !strIngredients.matches(pat.pattern()) &&
-                    !strIngredients.contains("null"))
-                getJSONContents.append("\u2022 ").append(strIngredients).append("\n\n");
+            if (strInstr!=null &&
+                    !strInstr.isEmpty() &&
+                    !strInstr.matches(pat.pattern()) &&
+                    !strInstr.contains("null"))
+                getJSONContents.append("\u2022 ").append(strInstr).append("\n\n");
         }
 
-        Log.i("Cocktail_Ingredients : ",getJSONContents.toString());
+        Log.i("Cocktail_Instr : ",getJSONContents.toString());
 
     }
 
+
     private class AsyncTaskClass extends AsyncTask {
 
-        TextView ingredients;
+        TextView instructions;
 
         @Override
         protected Object doInBackground(Object[] params) {
             try {
+                Log.i("Cocktail_Async : ", " Here");
 
                 cocktailDBAPI();
 
@@ -307,11 +259,11 @@ public class ListenActivity extends Activity implements RecognitionListener {
             //super.onPreExecute();
             progressBar.setVisibility(View.VISIBLE);
 
-            speech = SpeechRecognizer.createSpeechRecognizer(ListenActivity.this);
-            speech.setRecognitionListener(ListenActivity.this);
+            speech = SpeechRecognizer.createSpeechRecognizer(InstructionsActivity.this);
+            speech.setRecognitionListener(InstructionsActivity.this);
             recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,"en");
-            recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,ListenActivity.this.getPackageName());
+            recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,InstructionsActivity.this.getPackageName());
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
             recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
             speech.startListening(recognizerIntent);
@@ -319,12 +271,13 @@ public class ListenActivity extends Activity implements RecognitionListener {
 
         @Override
         protected void onPostExecute(Object o) {
-           // super.onPostExecute(o);
+            // super.onPostExecute(o);
             progressBar.setVisibility(View.GONE);
-            ingredients = (TextView)findViewById(R.id.ingredients);
-            ingredients.setText(getJSONContents);
-            text.setText("Keep these handy");
+            instructions = (TextView)findViewById(R.id.instructions);
+            instructions.setText(getJSONContents);
+            steps.setText("Steps");
             drinkName.setText(strName);
         }
     }
+
 }
