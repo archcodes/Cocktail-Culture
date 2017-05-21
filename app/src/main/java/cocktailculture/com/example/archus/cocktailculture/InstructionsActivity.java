@@ -44,8 +44,8 @@ public class InstructionsActivity extends Activity implements RecognitionListene
     protected StringBuilder getJSONContents = new StringBuilder();
     String LOG_TAG = "Cocktail : ";
 
-
-
+    Bundle bundle;
+    int flag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +132,8 @@ public class InstructionsActivity extends Activity implements RecognitionListene
             if (matches.get(i).contains("next"))
             {
                 Toast.makeText(this,"Next",Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(InstructionsActivity.this,StepsActivity.class);
+                Intent intent = new Intent(InstructionsActivity.this,InstructionsActivity.class);
+                intent.putExtras(this.getIntent().getExtras());
                 startActivity(intent);
             }
             if (matches.get(i).contains("previous"))
@@ -199,39 +200,55 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
     protected void cocktailDBAPI() throws IOException, JSONException {
 
-        int b;
-        Log.i("Cocktail STR_ID :", STR_ID);
-        String searchById = "http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=" + getIntent().getExtras().getString(STR_ID);
-        StringBuilder getAPIContent = new StringBuilder();
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet(searchById);
-        HttpResponse response = httpclient.execute(httpGet);
-        InputStream stream = response.getEntity().getContent();
 
-        while ((b = stream.read()) != -1) {
-            getAPIContent.append((char) b);
-        }
+   //     if(flag == 0) {
+            int b;
+            Log.i("Cocktail STR_ID :", STR_ID);
+            String searchById = "http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=" + getIntent().getExtras().getString(STR_ID);
+            StringBuilder getAPIContent = new StringBuilder();
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpGet httpGet = new HttpGet(searchById);
+            HttpResponse response = httpclient.execute(httpGet);
+            InputStream stream = response.getEntity().getContent();
 
-        Log.i("Cocktail GETAPI: ",getAPIContent.toString());
+            while ((b = stream.read()) != -1) {
+                getAPIContent.append((char) b);
+            }
 
-        JSONObject jsonObject = new JSONObject(getAPIContent.toString());
+            Log.i("Cocktail GETAPI: ", getAPIContent.toString());
 
-        //15 because cocktailDB has max 15 ingredients ;)
-        for(int j=1;j<=15;j++) {
+            JSONObject jsonObject = new JSONObject(getAPIContent.toString());
 
-            String strInstr = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get(STR_INSTR + j).toString();
+            String strInstr = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get(STR_INSTR).toString();
+
+            //splitting at "."
+         //   String[] splitAtDot = strInstr.split(".");
+
             strName = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get("strDrink").toString();
 
 
             Pattern pat = Pattern.compile("\\s\\s+");
-            if (strInstr!=null &&
+            if (strInstr != null &&
                     !strInstr.isEmpty() &&
                     !strInstr.matches(pat.pattern()) &&
                     !strInstr.contains("null"))
                 getJSONContents.append("\u2022 ").append(strInstr).append("\n\n");
-        }
+//parse "."
+/*
+            String[] splitAtDot = strInstr.split(".");
+*//*
+            flag++;
+            bundle.putStringArray("splitAtDot", splitAtDot);
+            bundle.putInt("flag", flag);
+            Log.i("Cocktail_Instr : ", getJSONContents.toString());*/
+      /*  }
 
-        Log.i("Cocktail_Instr : ",getJSONContents.toString());
+        else {
+            String[] verifySplit = (String[]) bundle.get("splitAtDot");
+            if(flag < verifySplit.length) {
+
+            }
+        }*/
 
     }
 

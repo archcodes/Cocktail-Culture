@@ -70,6 +70,8 @@ public class ListenActivity extends Activity implements RecognitionListener {
 
         new AsyncTaskClass().execute();
 
+        Log.i("Cocktail bundle: ", this.getIntent().getExtras().getString(STR_ID));
+
         text = (TextView)findViewById(R.id.choice);
         drinkName = (TextView)findViewById(R.id.drinkName);
 
@@ -179,9 +181,11 @@ public class ListenActivity extends Activity implements RecognitionListener {
             if (matches.get(i).contains("next"))
             {
                 Toast.makeText(this,"Next",Toast.LENGTH_LONG).show();
-          //      Intent intent = new Intent(ListenActivity.this,InstructionsActivity.class);
-          //      intent.putExtras(bundle);
-          //      startActivity(intent);
+                Intent intent = new Intent(ListenActivity.this,InstructionsActivity.class);
+             //   bundle = new Bundle();
+            //    bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
+                intent.putExtras(this.getIntent().getExtras());
+                startActivity(intent);
             }
             if (matches.get(i).contains("previous"))
             {
@@ -251,7 +255,9 @@ public class ListenActivity extends Activity implements RecognitionListener {
         int b;
         Log.i("Cocktail STR_ID :", STR_ID);
         String searchById = "http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=" + getIntent().getExtras().getString(STR_ID);
-   //     bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
+/*
+        bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
+*/
         StringBuilder getAPIContent = new StringBuilder();
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(searchById);
@@ -325,6 +331,8 @@ public class ListenActivity extends Activity implements RecognitionListener {
             ingredients.setText(getJSONContents);
             text.setText("Keep these handy");
             drinkName.setText(strName);
+       //     bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
+
         }
     }
 }
