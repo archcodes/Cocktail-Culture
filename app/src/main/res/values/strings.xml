@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CocktailCulture</string>
+    <string name="Click_here_to_start">Get Started!"</string>
+    <string name="Next">Next</string>
+    <string name="Choice">Make your choice</string>
+    <string name="title_activity_listen">ListenActivity</string>
+    <string name="ingredients">Keep these handy!</string>
+    <string name="sayStart">Listening...Say START!</string>
+
+</resources>
