@@ -46,6 +46,7 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
     Bundle bundle;
     int flag = 0;
+    String[] verifySplit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,24 +129,47 @@ public class InstructionsActivity extends Activity implements RecognitionListene
         speech.stopListening();
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
-        for(int i=0;i<matches.size();i++) {
-            Log.i("Cocktail", matches.get(i));
-            if (matches.get(i).contains("next"))
-            {
-                Toast.makeText(this,"Next",Toast.LENGTH_LONG).show();
+ //       flag = bundle.getInt("flag");
+       verifySplit = bundle.getStringArray("splitAtDot");
 
-                Intent intent = new Intent(InstructionsActivity.this,InstructionsActivity.class);
-//                intent.putExtras(this.getIntent().getExtras());
-                intent.putExtras(bundle);
-                startActivity(intent);
+        for(int i=0;i<matches.size();i++) {
+
+            Log.i("Cocktail", matches.get(i));
+            if (matches.get(i).contains("next")) {
+                Toast.makeText(this, "Next", Toast.LENGTH_LONG).show();
+                flag++;
+                if (flag < verifySplit.length) {
+                    Intent intent = new Intent(InstructionsActivity.this, InstructionsActivity.class);
+//                  intent.putExtras(this.getIntent().getExtras());
+                    bundle.putInt("flag", flag);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(InstructionsActivity.this, IngredientsActivity.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
             }
             if (matches.get(i).contains("previous"))
             {
-                Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
+               /* Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
+
+                flag--;
+                if (flag==0) {
+                    Intent intent = new Intent(InstructionsActivity.this,ListenActivity.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+                if (flag>0) {
+                    Intent intent = new Intent(InstructionsActivity.this,InstructionsActivity.class);
+                    bundle.putInt("flag", flag);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }*/
             }
-            if (matches.get(i).contains("start"))
+            if (matches.get(i).contains("repeat"))
             {
-                Toast.makeText(this,"Start",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Repeat",Toast.LENGTH_LONG).show();
             }
         }
 
@@ -240,14 +264,14 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
             Log.i("Cocktail_Instr_1 : ", getJSONContents.toString());
 
-            flag++;
+ //           flag++;
             bundle.putStringArray("splitAtDot", splitAtDot);
-            bundle.putInt("flag", flag);
+//            bundle.putInt("flag", flag);
             bundle.putString("strName" , strName);
 
         }
         else {
-            String[] verifySplit = (String[]) this.getIntent().getExtras().getStringArray("splitAtDot");
+          verifySplit = (String[]) this.getIntent().getExtras().getStringArray("splitAtDot");
          //   flag = this.getIntent().getExtras().getInt("flag");
 
             if(flag < verifySplit.length) {
@@ -261,18 +285,15 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                         !verifySplit[flag].contains("null"))
                     getJSONContents.append("\u2022 ").append(verifySplit[flag]).append("\n\n");
 //parse "."
-                flag++;
+ //               flag++;
                 bundle.putStringArray("splitAtDot", verifySplit);
-                bundle.putInt("flag", flag);
+ //               bundle.putInt("flag", flag);
                 bundle.putString("strName" , strName);
 
                 Log.i("Cocktail_Instr_2 : ", getJSONContents.toString());
 
             }
 
-         /*   else {
-
-            }*/
         }
 
         }

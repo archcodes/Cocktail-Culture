@@ -40,7 +40,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/FullscreenTheme" />
         <activity android:name=".IngredientsActivity" />
-        <activity android:name=".StepsActivity" />
         <activity android:name=".InstructionsActivity"></activity>
     </application>
 
