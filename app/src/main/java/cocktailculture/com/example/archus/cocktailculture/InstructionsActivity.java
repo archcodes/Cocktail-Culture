@@ -146,30 +146,27 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(InstructionsActivity.this, IngredientsActivity.class);
+                    bundle.putInt("flag", flag); //For back from Ingredients activity
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }
-            }
-            if (matches.get(i).contains("previous"))
-            {
-               /* Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
-
+            } else if (matches.get(i).contains("previous")) {
+                Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
                 flag--;
-                if (flag==0) {
+                if (flag<0) {
                     Intent intent = new Intent(InstructionsActivity.this,ListenActivity.class);
                     intent.putExtras(bundle);
                     startActivity(intent);
-                }
-                if (flag>0) {
+                } else {
                     Intent intent = new Intent(InstructionsActivity.this,InstructionsActivity.class);
                     bundle.putInt("flag", flag);
                     intent.putExtras(bundle);
                     startActivity(intent);
-                }*/
-            }
-            if (matches.get(i).contains("repeat"))
-            {
+                }
+            } else if (matches.get(i).contains("repeat")) {
                 Toast.makeText(this,"Repeat",Toast.LENGTH_LONG).show();
+            } else {
+                //Dont do anything for now
             }
         }
 

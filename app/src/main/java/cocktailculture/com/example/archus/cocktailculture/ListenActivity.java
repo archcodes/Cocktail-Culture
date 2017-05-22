@@ -189,10 +189,9 @@ public class ListenActivity extends Activity implements RecognitionListener {
             }
             if (matches.get(i).contains("previous"))
             {
-               /* Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(ListenActivity.this,MenuActivity.class);
-                startActivity(intent);*/
-
+                startActivity(intent);
             }
             if (matches.get(i).contains("start"))
             {

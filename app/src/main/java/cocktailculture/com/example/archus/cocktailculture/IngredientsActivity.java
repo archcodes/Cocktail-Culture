@@ -159,13 +159,20 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
                 startActivity(intent);
             }
             if (matches.get(i).contains("previous")) {
-/*                Toast.makeText(this, "Previous", Toast.LENGTH_LONG).show();
-                int flag = intent.getExtras().getInt("flag");
+                Toast.makeText(this, "Previous", Toast.LENGTH_LONG).show();
 
-                intent = new Intent(IngredientsActivity.this,InstructionsActivity.class);
-                flag--;
-                intent.putExtra("flag",flag);
-                startActivity(intent);*/
+                //initialize local variables for the bundle
+                int localFlag = getIntent().getExtras().getInt("flag");
+                localFlag--;
+
+                Bundle localBundle = new Bundle();
+                localBundle.putInt("flag", localFlag);
+                localBundle.putStringArray("splitAtDot", getIntent().getExtras().getStringArray("splitAtDot"));
+                localBundle.putString("strName", getIntent().getExtras().getString("strName"));
+
+                Intent localIntent = new Intent(IngredientsActivity.this,InstructionsActivity.class);
+                localIntent.putExtras(localBundle);
+                startActivity(localIntent);
             }
             if (matches.get(i).contains("start")) {
                 Toast.makeText(this, "Start", Toast.LENGTH_LONG).show();
