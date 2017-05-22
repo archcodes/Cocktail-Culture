@@ -1,6 +1,7 @@
 package cocktailculture.com.example.archus.cocktailculture;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -9,11 +10,15 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -21,6 +26,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,6 +39,8 @@ public class ListenActivity extends Activity implements RecognitionListener {
     public static final String STR_INGREDIENT = "strIngredient";
     public static final String STR_INSTR = "strInstructions";
     public static final String DRINKS = "drinks";
+    //private TextView returnedText;
+    private ToggleButton toggleButton;
     private ProgressBar progressBar;
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
@@ -48,12 +56,18 @@ public class ListenActivity extends Activity implements RecognitionListener {
     private TextToSpeech text2speech;
     protected StringBuilder getJSONContents = new StringBuilder();
 
+
+    //   private SpeechRecognizer sphinxRecognizer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOG_TAG, String.format("Inside Google"));
         setContentView(R.layout.activity_listen);
+        //returnedText = (TextView) findViewById(R.id.textView1);
         progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+      //  toggleButton = (ToggleButton) findViewById(R.id.toggleButton1);
+     //   progressBar.setVisibility(View.INVISIBLE);
 
         new AsyncTaskClass().execute();
 
@@ -62,6 +76,37 @@ public class ListenActivity extends Activity implements RecognitionListener {
         bundle = new Bundle();
         text = (TextView)findViewById(R.id.choice);
         drinkName = (TextView)findViewById(R.id.drinkName);
+
+       /* int permissionCheck = ContextCompat.checkSelfPermission(ListenActivity.this,
+                Manifest.permission.RECORD_AUDIO);
+*/
+        /*speech = SpeechRecognizer.createSpeechRecognizer(this);
+        speech.setRecognitionListener(this);
+        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,"en");
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,this.getPackageName());
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+        speech.startListening(recognizerIntent);*/
+
+
+/*        toggleButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                if (isChecked) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    progressBar.setIndeterminate(true);
+
+                } else {
+                    progressBar.setIndeterminate(false);
+                    progressBar.setVisibility(View.INVISIBLE);
+
+                }
+            }
+        });*/
+
     }
 
     @Override
@@ -103,6 +148,13 @@ public class ListenActivity extends Activity implements RecognitionListener {
         String errorMessage = getErrorText(errorCode);
         speech.stopListening();
         Log.d(LOG_TAG, "FAILED " + errorMessage);
+        /*returnedText.setText(errorMessage);*/
+
+   //     toggleButton.setChecked(false);
+       /* Intent data = new Intent();
+        data.putExtra("returnData", errorMessage);
+        setResult(RESULT_OK, data);
+        super.finish();*/
     }
 
     @Override
@@ -128,26 +180,34 @@ public class ListenActivity extends Activity implements RecognitionListener {
 
         for(int i=0;i<matches.size();i++) {
             Log.i("Cocktail", matches.get(i));
-            if (matches.get(i).contains("next")) {
+            if (matches.get(i).contains("next"))
+            {
                 Toast.makeText(this,"Next",Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(ListenActivity.this,InstructionsActivity.class);
+             //   bundle = new Bundle();
+            //    bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
-            else if (matches.get(i).contains("previous")) {
+            if (matches.get(i).contains("previous"))
+            {
                 Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(ListenActivity.this,MenuActivity.class);
                 startActivity(intent);
             }
-           else if (matches.get(i).contains("repeat")) {
-                Toast.makeText(this,"Repeat",Toast.LENGTH_LONG).show();
+            if (matches.get(i).contains("start"))
+            {
+                Toast.makeText(this,"Start",Toast.LENGTH_LONG).show();
             }
-            else {
-                //Don't do anything for now.
-            }
-
         }
-        super.finish();
+
+        /*Intent data = new Intent();
+
+        String returnString = matches.get(0);
+        data.putExtra("returnData", returnString);
+
+        setResult(RESULT_OK, data);
+*/        super.finish();
     }
 
     @Override
@@ -199,6 +259,9 @@ public class ListenActivity extends Activity implements RecognitionListener {
         int b;
         Log.i("Cocktail STR_ID :", STR_ID);
         String searchById = "http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=" + getIntent().getExtras().getString(STR_ID);
+/*
+        bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
+*/
         StringBuilder getAPIContent = new StringBuilder();
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(searchById);
@@ -280,6 +343,8 @@ public class ListenActivity extends Activity implements RecognitionListener {
             ingredients.setText(getJSONContents);
             text.setText("Keep these handy");
             drinkName.setText(strName);
+       //     bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
+
         }
     }
 }

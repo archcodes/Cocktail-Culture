@@ -40,6 +40,7 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
         speech.startListening(recognizerIntent);
         Bundle bundle;
+//        Toast.makeText(this, speech.toString(),Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -78,7 +79,13 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
         String errorMessage = getErrorText(errorCode);
         speech.stopListening();
         Log.d("", "FAILED " + errorMessage);
+        /*returnedText.setText(errorMessage);*/
 
+        //     toggleButton.setChecked(false);
+       /* Intent data = new Intent();
+        data.putExtra("returnData", errorMessage);
+        setResult(RESULT_OK, data);
+        super.finish();*/
     }
 
     @Override
