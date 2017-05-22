@@ -19,6 +19,7 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
     private Intent recognizerIntent;
     Intent intent;
     TextView enjoyString;
+    public static final String STR_ID = "idDrink";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +170,7 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
                 localBundle.putInt("flag", localFlag);
                 localBundle.putStringArray("splitAtDot", getIntent().getExtras().getStringArray("splitAtDot"));
                 localBundle.putString("strName", getIntent().getExtras().getString("strName"));
+                localBundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID)); //ID
 
                 Intent localIntent = new Intent(IngredientsActivity.this,InstructionsActivity.class);
                 localIntent.putExtras(localBundle);

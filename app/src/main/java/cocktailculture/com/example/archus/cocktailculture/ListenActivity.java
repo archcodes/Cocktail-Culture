@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 public class ListenActivity extends Activity implements RecognitionListener {
 
     public static final String STR_INGREDIENT = "strIngredient";
+    public static final String STR_INSTR = "strInstructions";
     public static final String DRINKS = "drinks";
     //private TextView returnedText;
     private ToggleButton toggleButton;
@@ -72,6 +73,7 @@ public class ListenActivity extends Activity implements RecognitionListener {
 
         Log.i("Cocktail bundle: ", this.getIntent().getExtras().getString(STR_ID));
 
+        bundle = new Bundle();
         text = (TextView)findViewById(R.id.choice);
         drinkName = (TextView)findViewById(R.id.drinkName);
 
@@ -184,7 +186,7 @@ public class ListenActivity extends Activity implements RecognitionListener {
                 Intent intent = new Intent(ListenActivity.this,InstructionsActivity.class);
              //   bundle = new Bundle();
             //    bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
-                intent.putExtras(this.getIntent().getExtras());
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
             if (matches.get(i).contains("previous"))
@@ -288,8 +290,16 @@ public class ListenActivity extends Activity implements RecognitionListener {
                     !strIngredients.contains("null"))
                 getJSONContents.append("\u2022 ").append(strIngredients).append("\n\n");
         }
-
         Log.i("Cocktail_Ingredients : ",getJSONContents.toString());
+        bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID)); //ID
+        bundle.putString("strName", strName); //strName
+        bundle.putInt("flag", 0); //flag
+
+        String strInstr = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get(STR_INSTR).toString();
+        String[] splitAtDot = strInstr.split("\\.");
+        bundle.putStringArray("splitAtDot", splitAtDot); //Split
+
+
 
     }
 

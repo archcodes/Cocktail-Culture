@@ -228,68 +228,27 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
         Log.i("Cocktail FLAG : ", flag+"");
 
-        if(flag == 0) {
-            int b;
-            Log.i("Cocktail STR_ID :", STR_ID);
-            String searchById = "http://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=" + getIntent().getExtras().getString(STR_ID);
-            StringBuilder getAPIContent = new StringBuilder();
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httpGet = new HttpGet(searchById);
-            HttpResponse response = httpclient.execute(httpGet);
-            InputStream stream = response.getEntity().getContent();
+        verifySplit = (String[]) this.getIntent().getExtras().getStringArray("splitAtDot");
+        flag = this.getIntent().getExtras().getInt("flag");
 
-            while ((b = stream.read()) != -1) {
-                getAPIContent.append((char) b);
-            }
+        if(flag < verifySplit.length) {
 
-            Log.i("Cocktail GETAPI: ", getAPIContent.toString());
+            strName = this.getIntent().getExtras().getString("strName");
 
-            JSONObject jsonObject = new JSONObject(getAPIContent.toString());
-
-            String strInstr = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get(STR_INSTR).toString();
-
-            strName = ((JSONArray) (jsonObject.get(DRINKS))).getJSONObject(0).get("strDrink").toString();
-
-            //splitting at "."
-            String[] splitAtDot = strInstr.split("\\.");
             Pattern pat = Pattern.compile("\\s\\s+");
-            if (splitAtDot[flag] != null &&
-                    !splitAtDot[flag].isEmpty() &&
-                    !splitAtDot[flag].matches(pat.pattern()) &&
-                    !splitAtDot[flag].contains("null"))
-                getJSONContents.append("\u2022 ").append(splitAtDot[flag]).append("\n\n");
-
-            Log.i("Cocktail_Instr_1 : ", getJSONContents.toString());
-
- //           flag++;
-            bundle.putStringArray("splitAtDot", splitAtDot);
-//            bundle.putInt("flag", flag);
+            if (verifySplit[flag] != null &&
+                    !verifySplit[flag].isEmpty() &&
+                    !verifySplit[flag].matches(pat.pattern()) &&
+                    !verifySplit[flag].contains("null"))
+                getJSONContents.append("\u2022 ").append(verifySplit[flag]).append("\n\n");
+//parse "."
+//               flag++;
+            bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID)); //ID
+            bundle.putStringArray("splitAtDot", verifySplit);
+//               bundle.putInt("flag", flag);
             bundle.putString("strName" , strName);
 
-        }
-        else {
-          verifySplit = (String[]) this.getIntent().getExtras().getStringArray("splitAtDot");
-         //   flag = this.getIntent().getExtras().getInt("flag");
-
-            if(flag < verifySplit.length) {
-
-                strName = this.getIntent().getExtras().getString("strName");
-
-                Pattern pat = Pattern.compile("\\s\\s+");
-                if (verifySplit[flag] != null &&
-                        !verifySplit[flag].isEmpty() &&
-                        !verifySplit[flag].matches(pat.pattern()) &&
-                        !verifySplit[flag].contains("null"))
-                    getJSONContents.append("\u2022 ").append(verifySplit[flag]).append("\n\n");
-//parse "."
- //               flag++;
-                bundle.putStringArray("splitAtDot", verifySplit);
- //               bundle.putInt("flag", flag);
-                bundle.putString("strName" , strName);
-
-                Log.i("Cocktail_Instr_2 : ", getJSONContents.toString());
-
-            }
+            Log.i("Cocktail_Instr_2 : ", getJSONContents.toString());
 
         }
 
