@@ -152,14 +152,13 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
         /*Toast.makeText(this, speech.toString(),Toast.LENGTH_LONG).show();*/
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
-        for (int i = 0; i < matches.size(); i++) {
-            Log.i("Cocktail", matches.get(i));
-            if (matches.get(i).contains("next")) {
+        /*for (int i = 0; i < matches.size(); i++) {*/
+            Log.i("Cocktail", matches.toString());
+            if (matches.toString().contains("next")) {
                 Toast.makeText(this, "Next", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(IngredientsActivity.this, MenuActivity.class);
                 startActivity(intent);
-            }
-            if (matches.get(i).contains("previous")) {
+            } else if (matches.toString().contains("previous")) {
                 Toast.makeText(this, "Previous", Toast.LENGTH_LONG).show();
 
                 //initialize local variables for the bundle
@@ -175,12 +174,14 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
                 Intent localIntent = new Intent(IngredientsActivity.this,InstructionsActivity.class);
                 localIntent.putExtras(localBundle);
                 startActivity(localIntent);
-            }
-            if (matches.get(i).contains("start")) {
-                Toast.makeText(this, "Start", Toast.LENGTH_LONG).show();
+            } else {
+                Intent localIntent = new Intent(IngredientsActivity.this, IngredientsActivity.class);
+                localIntent.putExtras(getIntent().getExtras());
+                startActivity(localIntent);
+
             }
 
-        }
+        /*}*/
     }
 
 }

@@ -1,12 +1,15 @@
 package cocktailculture.com.example.archus.cocktailculture;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class InstructionsActivity extends Activity implements RecognitionListener {
@@ -47,6 +51,9 @@ public class InstructionsActivity extends Activity implements RecognitionListene
     Bundle bundle;
     int flag = 0;
     String[] verifySplit;
+    TextToSpeech t1;
+    TextView instructions;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +63,16 @@ public class InstructionsActivity extends Activity implements RecognitionListene
         steps = (TextView) findViewById(R.id.steps);
         drinkName = (TextView)findViewById(R.id.drinkName);
         bundle = new Bundle();
+
+        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    t1.setLanguage(Locale.UK);
+                }
+            }
+        });
+
         new InstructionsActivity.AsyncTaskClass().execute();
     }
 
@@ -67,13 +84,26 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
     @Override
     protected void onPause() {
-        super.onPause();
+       // super.onPause();
+        /*if(t1 !=null){
+            t1.stop();
+            //     t1.shutdown();
+        }*/
         if (speech != null) {
             speech.destroy();
             Log.i(LOG_TAG, "destroy");
         }
+        super.onPause();
 
     }
+
+    /*@Override
+    public void onDestroy() {
+        if (t1 != null) {
+            t1.shutdown();
+        }
+        super.onDestroy();
+    }*/
 
     @Override
     public void onBeginningOfSpeech() {
@@ -123,20 +153,27 @@ public class InstructionsActivity extends Activity implements RecognitionListene
         Log.i(LOG_TAG, "onReadyForSpeech");
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onResults(Bundle results) {
         Log.i(LOG_TAG, "onResults");
         speech.stopListening();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
  //       flag = bundle.getInt("flag");
        verifySplit = bundle.getStringArray("splitAtDot");
 
-        for(int i=0;i<matches.size();i++) {
 
-            Log.i("Cocktail", matches.get(i));
-            if (matches.get(i).contains("next")) {
-                Toast.makeText(this, "Next", Toast.LENGTH_LONG).show();
+        /*for(int i=0;i<matches.size();i++) {*/
+
+            Log.i("Cocktail", matches.toString());
+            if (matches.toString().contains("next")) {
+                Toast.makeText(this, "Next", Toast.LENGTH_SHORT).show();
                 flag++;
                 if (flag < verifySplit.length) {
                     Intent intent = new Intent(InstructionsActivity.this, InstructionsActivity.class);
@@ -150,8 +187,8 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }
-            } else if (matches.get(i).contains("previous")) {
-                Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
+            } else if (matches.toString().contains("previous")) {
+                Toast.makeText(this,"Previous",Toast.LENGTH_SHORT).show();
                 flag--;
                 if (flag<0) {
                     Intent intent = new Intent(InstructionsActivity.this,ListenActivity.class);
@@ -163,12 +200,54 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }
-            } else if (matches.get(i).contains("repeat")) {
-                Toast.makeText(this,"Repeat",Toast.LENGTH_LONG).show();
+            } else if (matches.toString().contains("speak")) {
+                Toast.makeText(this,"Speak",Toast.LENGTH_SHORT).show();
+                Log.i("Cocktail: TALK", "TALK");
+                /*t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int status) {
+                        if(status != TextToSpeech.ERROR) {
+                            t1.setLanguage(Locale.UK);
+                        }
+                    }
+                });*/
+              //  HashMap<String, String> map = new HashMap<String, String>();
+              //  map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "NOW");
+                instructions = (TextView) findViewById(R.id.instructions);
+                String toSpeak = instructions.getText().toString();
+                //Toast.makeText(getApplicationContext(), toSpeak,Toast.LENGTH_SHORT).show();
+               // t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, map);
+                Bundle params = new Bundle();
+                params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "");
+                t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, params, "UniqueID");
+
+                //Calling same page again
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                while(t1.isSpeaking()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                /*t1.stop();*/
+                /*speech.stopListening();*/
+                Intent intent = new Intent(InstructionsActivity.this,InstructionsActivity.class);
+                /*bundle.putInt("flag", flag);*/
+                intent.putExtras(getIntent().getExtras());
+                startActivity(intent);
             } else {
                 //Dont do anything for now
+                Intent intent = new Intent(InstructionsActivity.this,InstructionsActivity.class);
+                /*bundle.putInt("flag", flag);*/
+                intent.putExtras(getIntent().getExtras());
+                startActivity(intent);
             }
-        }
+        /*}*/
 
         /*Intent data = new Intent();
 
@@ -257,7 +336,7 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
     private class AsyncTaskClass extends AsyncTask {
 
-        TextView instructions;
+//        TextView instructions;
 
         @Override
         protected Object doInBackground(Object[] params) {

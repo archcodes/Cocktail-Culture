@@ -178,9 +178,9 @@ public class ListenActivity extends Activity implements RecognitionListener {
         speech.stopListening();
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
-        for(int i=0;i<matches.size();i++) {
-            Log.i("Cocktail", matches.get(i));
-            if (matches.get(i).contains("next"))
+        /*for(int i=0;i<matches.size();i++) {*/
+            Log.i("Cocktail", matches.toString());
+            if (matches.toString().contains("next"))
             {
                 Toast.makeText(this,"Next",Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(ListenActivity.this,InstructionsActivity.class);
@@ -188,18 +188,18 @@ public class ListenActivity extends Activity implements RecognitionListener {
             //    bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID));
                 intent.putExtras(bundle);
                 startActivity(intent);
-            }
-            if (matches.get(i).contains("previous"))
+            } else if (matches.toString().contains("previous"))
             {
                 Toast.makeText(this,"Previous",Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(ListenActivity.this,MenuActivity.class);
                 startActivity(intent);
-            }
-            if (matches.get(i).contains("start"))
+            } else
             {
-                Toast.makeText(this,"Start",Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(ListenActivity.this, ListenActivity.class);
+                intent.putExtras(getIntent().getExtras());
+                startActivity(intent);
             }
-        }
+        /*}*/
 
         /*Intent data = new Intent();
 
