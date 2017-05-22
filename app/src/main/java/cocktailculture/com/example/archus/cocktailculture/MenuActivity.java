@@ -1,15 +1,11 @@
 package cocktailculture.com.example.archus.cocktailculture;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TableLayout;
@@ -29,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -56,10 +51,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
         new AsyncTaskClass().execute();
 
-
-        /*next = (TextView) findViewById(R.id.nextButton);
-        next.setOnClickListener(this);*/
-
         contentsTable = (TableLayout) findViewById(R.id.contentsTable);
         tr = (TableRow) findViewById(R.id.row);
         /*menuItems.add("Mai Tai");
@@ -74,11 +65,9 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         menuItems.add("Pina Colada");
         menuItems.add("Long Island Ice Tea");
         menuItems.add("Screwdriver");
-        menuItems.add("White Russian");*/
+        menuItems.add("White Russian");
+        addItems(); */
 
-/*
-        addItems();
-*/
     }
 
     private void addItems() {
@@ -86,10 +75,8 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         int counter = 0;
 
         for(Map.Entry<String,ArrayList<String>> entrySet : mapOfcontents.entrySet()) {
-            //for(int i=0; i<mapOfcontents.size(); i++) {
             tr = new TableRow(this);
-            //tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-             //       TableRow.LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL));
+
             item = new TextView(this);
 
                 item.setText(entrySet.getValue().get(0));
@@ -108,12 +95,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
                 tr.setOnClickListener(MenuActivity.this);
                 contentsTable.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, 150));
 
-           /* TableLayout.LayoutParams params = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT,
-                    TableLayout.LayoutParams.WRAP_CONTENT);
-            params.gravity= Gravity.CENTER;
-            contentsTable.addView(tr);
-            contentsTable.setLayoutParams(params);*/
-
                 TableLayout.LayoutParams p = new TableLayout.LayoutParams();
                 p.setMargins(0, 0, 0, 5);
                 tr.setLayoutParams(p);
@@ -125,7 +106,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
 
         Bundle bundle = new Bundle();
         Intent intent = new Intent(MenuActivity.this,ListenActivity.class);
-      //  intent.putExtra(STR_ID, String.valueOf(v.getId()));
         bundle.putString(STR_ID, String.valueOf(v.getId()));
         intent.putExtras(bundle);
         Log.i("Cocktail V.GETID :", String.valueOf(v.getId()));
@@ -167,9 +147,6 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
             contents.add(drinkImg);
 
             mapOfcontents.put(drinkId,contents);
-
-           /* if (strIngredients.length()>0)
-                getJSONContents.append("\u2022 ").append(strIngredients).append("\n\n");*/
         }
 
         Log.i("Cocktail_Ingredients : ",getJSONContents.toString());

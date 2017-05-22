@@ -7,24 +7,14 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -140,7 +130,6 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                 flag++;
                 if (flag < verifySplit.length) {
                     Intent intent = new Intent(InstructionsActivity.this, InstructionsActivity.class);
-//                  intent.putExtras(this.getIntent().getExtras());
                     bundle.putInt("flag", flag);
                     intent.putExtras(bundle);
                     startActivity(intent);
@@ -169,14 +158,7 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                 //Dont do anything for now
             }
         }
-
-        /*Intent data = new Intent();
-
-        String returnString = matches.get(0);
-        data.putExtra("returnData", returnString);
-
-        setResult(RESULT_OK, data);
-*/        super.finish();
+        super.finish();
     }
 
     @Override
@@ -241,11 +223,9 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                     !verifySplit[flag].matches(pat.pattern()) &&
                     !verifySplit[flag].contains("null"))
                 getJSONContents.append("\u2022 ").append(verifySplit[flag]).append("\n\n");
-//parse "."
-//               flag++;
+
             bundle.putString(STR_ID, getIntent().getExtras().getString(STR_ID)); //ID
             bundle.putStringArray("splitAtDot", verifySplit);
-//               bundle.putInt("flag", flag);
             bundle.putString("strName" , strName);
 
             Log.i("Cocktail_Instr_2 : ", getJSONContents.toString());
