@@ -1,6 +1,8 @@
 package cocktailculture.com.example.archus.cocktailculture;
 
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -20,11 +22,13 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
     Intent intent;
     TextView enjoyString;
     public static final String STR_ID = "idDrink";
+    AudioManager amanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ingredients);
+        amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
         speech = SpeechRecognizer.createSpeechRecognizer(this);
         speech.setRecognitionListener(this);
 
@@ -77,15 +81,19 @@ public class IngredientsActivity extends AppCompatActivity implements Recognitio
     @Override
     public void onError(int errorCode) {
         String errorMessage = getErrorText(errorCode);
-        speech.stopListening();
+      //  speech.stopListening();
         Log.d("", "FAILED " + errorMessage);
-        /*returnedText.setText(errorMessage);*/
-
-        //     toggleButton.setChecked(false);
-       /* Intent data = new Intent();
+        speech.cancel();
+        /*Intent data = new Intent();
         data.putExtra("returnData", errorMessage);
-        setResult(RESULT_OK, data);
-        super.finish();*/
+        setResult(RESULT_OK, data);*/
+        //mute audio
+        amanager.setStreamVolume(AudioManager.STREAM_MUSIC,0,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+        amanager.setStreamVolume(AudioManager.STREAM_SYSTEM,0,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+        speech.startListening(recognizerIntent);
+      /*  amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, false);*/
+
     }
 
     @Override

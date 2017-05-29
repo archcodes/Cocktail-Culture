@@ -2,7 +2,9 @@ package cocktailculture.com.example.archus.cocktailculture;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.speech.RecognitionListener;
@@ -53,12 +55,14 @@ public class InstructionsActivity extends Activity implements RecognitionListene
     String[] verifySplit;
     TextToSpeech t1;
     TextView instructions;
+    AudioManager amanager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_instructions);
+        amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
         progressBar = (ProgressBar) findViewById(R.id.progressBar2);
         steps = (TextView) findViewById(R.id.steps);
         drinkName = (TextView)findViewById(R.id.drinkName);
@@ -127,15 +131,21 @@ public class InstructionsActivity extends Activity implements RecognitionListene
     @Override
     public void onError(int errorCode) {
         String errorMessage = getErrorText(errorCode);
-        speech.stopListening();
+        //speech.stopListening();
         Log.d(LOG_TAG, "FAILED " + errorMessage);
         /*returnedText.setText(errorMessage);*/
-
-        //     toggleButton.setChecked(false);
-        Intent data = new Intent();
+        speech.cancel();
+       /* Intent data = new Intent();
         data.putExtra("returnData", errorMessage);
         setResult(RESULT_OK, data);
-        super.finish();
+*/
+        //mute audio
+        amanager.setStreamVolume(AudioManager.STREAM_MUSIC,0,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+        amanager.setStreamVolume(AudioManager.STREAM_SYSTEM,0,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+        speech.startListening(recognizerIntent);
+      /*  amanager.setStreamVolume(AudioManager.STREAM_MUSIC,3,AudioManager.FLAG_PLAY_SOUND);
+        amanager.setStreamVolume(AudioManager.STREAM_SYSTEM,3,AudioManager.FLAG_PLAY_SOUND);*/
+      //  super.finish();
     }
 
     @Override
@@ -150,7 +160,9 @@ public class InstructionsActivity extends Activity implements RecognitionListene
 
     @Override
     public void onReadyForSpeech(Bundle arg0) {
+
         Log.i(LOG_TAG, "onReadyForSpeech");
+
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -159,7 +171,7 @@ public class InstructionsActivity extends Activity implements RecognitionListene
         Log.i(LOG_TAG, "onResults");
         speech.stopListening();
         try {
-            Thread.sleep(2000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -203,6 +215,8 @@ public class InstructionsActivity extends Activity implements RecognitionListene
             } else if (matches.toString().contains("speak")) {
                 Toast.makeText(this,"Speak",Toast.LENGTH_SHORT).show();
                 Log.i("Cocktail: TALK", "TALK");
+                amanager.setStreamVolume(AudioManager.STREAM_MUSIC,7,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+                amanager.setStreamVolume(AudioManager.STREAM_SYSTEM,7,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
                 /*t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int status) {
@@ -220,7 +234,6 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                 Bundle params = new Bundle();
                 params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "");
                 t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, params, "UniqueID");
-
                 //Calling same page again
                 try {
                     Thread.sleep(2000);
@@ -234,6 +247,8 @@ public class InstructionsActivity extends Activity implements RecognitionListene
                         e.printStackTrace();
                     }
                 }
+                amanager.setStreamVolume(AudioManager.STREAM_MUSIC,0,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+                amanager.setStreamVolume(AudioManager.STREAM_SYSTEM,0,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
                 /*t1.stop();*/
                 /*speech.stopListening();*/
                 Intent intent = new Intent(InstructionsActivity.this,InstructionsActivity.class);
@@ -262,6 +277,7 @@ public class InstructionsActivity extends Activity implements RecognitionListene
     public void onRmsChanged(float rmsdB) {
         Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
         progressBar.setProgress((int) rmsdB);
+
     }
 
     public static String getErrorText(int errorCode) {

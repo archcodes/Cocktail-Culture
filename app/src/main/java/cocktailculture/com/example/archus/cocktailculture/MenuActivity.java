@@ -130,7 +130,7 @@ public class MenuActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtras(bundle);
         Log.i("Cocktail V.GETID :", String.valueOf(v.getId()));
         startActivity(intent);
-        Toast.makeText(getApplicationContext(), "You clicked!!!"+v.getId(), Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(getApplicationContext(), "You clicked!!!"+v.getId(), Toast.LENGTH_SHORT).show();
     }
 
     protected void cocktailDBAPI() throws IOException, JSONException {

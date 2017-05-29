@@ -3,7 +3,9 @@ package cocktailculture.com.example.archus.cocktailculture;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
@@ -49,7 +51,7 @@ public class ListenActivity extends Activity implements RecognitionListener {
     TextView text, drinkName;
     String strName;
     Bundle bundle;
-
+    AudioManager amanager;
 
     private final int REQ_CODE_SPEECH_INPUT = 100;
     private HashMap<String, Integer> captions;
@@ -62,6 +64,7 @@ public class ListenActivity extends Activity implements RecognitionListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
         Log.i(LOG_TAG, String.format("Inside Google"));
         setContentView(R.layout.activity_listen);
         //returnedText = (TextView) findViewById(R.id.textView1);
@@ -146,15 +149,18 @@ public class ListenActivity extends Activity implements RecognitionListener {
     @Override
     public void onError(int errorCode) {
         String errorMessage = getErrorText(errorCode);
-        speech.stopListening();
+     //   speech.stopListening();
         Log.d(LOG_TAG, "FAILED " + errorMessage);
-        /*returnedText.setText(errorMessage);*/
-
-   //     toggleButton.setChecked(false);
+        speech.cancel();
        /* Intent data = new Intent();
         data.putExtra("returnData", errorMessage);
-        setResult(RESULT_OK, data);
-        super.finish();*/
+        setResult(RESULT_OK, data);*/
+        //mute audio
+        amanager.setStreamVolume(AudioManager.STREAM_MUSIC,0,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+        amanager.setStreamVolume(AudioManager.STREAM_SYSTEM,0,AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+        speech.startListening(recognizerIntent);
+        /*amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, false);*/
     }
 
     @Override
